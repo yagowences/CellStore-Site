@@ -30,7 +30,7 @@ export const PRODUCTS_DATA: Product[] = [
     description: 'Natural Titanium • Garantia Apple 1 Ano • Super Retina XDR 6.7"',
     priceCash: 7999,
     installments: '12x de R$ 749,90',
-    image: '/images/iphone15_gold_1783299696704.jpg',
+    image: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=800&q=80',
     whatsappMessage: 'Olá! Tenho interesse no iPhone 15 Pro Max 256GB Novo Lacrado de R$ 7.999.',
     specs: {
       screen: '6.7" Super Retina XDR OLED (120Hz ProMotion)',
@@ -49,7 +49,7 @@ export const PRODUCTS_DATA: Product[] = [
     description: 'Titanium Gray • Câmera 200MP • S-Pen Inclusa • IA Galaxy Integrada',
     priceCash: 7200,
     installments: '12x de R$ 689,00',
-    image: '/images/samsung_s24_1783299722056.jpg',
+    image: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&w=800&q=80',
     whatsappMessage: 'Olá! Tenho interesse no Samsung Galaxy S24 Ultra 512GB de R$ 7.200.',
     specs: {
       screen: '6.8" Dynamic AMOLED 2X QHD+ (120Hz adaptativo)',
@@ -69,7 +69,7 @@ export const PRODUCTS_DATA: Product[] = [
     description: 'Midnight • Impecável, sem marcas • Acompanha cabo original',
     priceCash: 3190,
     installments: '12x de R$ 299,00',
-    image: '/images/iphone13_blue_1783299704604.jpg',
+    image: 'https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?auto=format&fit=crop&w=800&q=80',
     whatsappMessage: 'Olá! Tenho interesse no iPhone 13 128GB Seminovo Midnight (Saúde 92%) por R$ 3.190.',
     specs: {
       screen: '6.1" Super Retina XDR OLED',
@@ -88,7 +88,7 @@ export const PRODUCTS_DATA: Product[] = [
     description: 'Cancelamento Ativo de Ruído • Som Espacial • Estojo de recarga MagSafe',
     priceCash: 1690,
     installments: '10x de R$ 169,00',
-    image: '/images/airpods_pro_1783299713349.jpg',
+    image: 'https://images.unsplash.com/photo-1588449668365-d15e397f6787?auto=format&fit=crop&w=800&q=80',
     whatsappMessage: 'Olá! Tenho interesse nos AirPods Pro 2ª Geração de R$ 1.690.',
     specs: {
       screen: 'Não aplicável (Áudio Premium)',
