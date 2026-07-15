@@ -1,0 +1,6 @@
+{
+  "name": "Cell Store Silvânia",
+  "description": "Landing Page de alta conversão para smartphones novos e seminovos em Silvânia-GO. Estilo minimalista premium com catálogo interativo e navegação otimizada para mobile.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
