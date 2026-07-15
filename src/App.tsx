@@ -261,7 +261,7 @@ export default function App() {
               <div className="absolute -left-4 -top-4 -right-4 -bottom-4 bg-orange-500/5 rounded-3xl blur-3xl"></div>
               <div className="relative overflow-hidden rounded-3xl bg-slate-900 p-2 shadow-2xl">
                 <img
-                  src="/src/assets/images/cellstore_hero_1783299688150.jpg"
+                  src="/images/cellstore_hero_1783299688150.jpg"
                   alt="Premium Smartphone Showcase"
                   referrerPolicy="no-referrer"
                   className="w-full rounded-2xl object-cover"
@@ -694,7 +694,7 @@ export default function App() {
               <div className="group relative overflow-hidden rounded-3xl border border-slate-100 bg-slate-100 shadow-lg aspect-[16/10]">
                 {/* 3D Map Visual */}
                 <img
-                  src="/src/assets/images/store_map_mockup_1783299730394.jpg"
+                  src="/images/store_map_mockup_1783299730394.jpg"
                   alt="Cell Store Location Map"
                   referrerPolicy="no-referrer"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-102"
