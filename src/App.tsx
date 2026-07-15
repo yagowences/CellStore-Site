@@ -18,7 +18,9 @@ import {
   Calendar,
   Zap,
   ShoppingBag,
-  Award
+  Award,
+  GitCompare,
+  X
 } from 'lucide-react';
 import { PRODUCTS_DATA, TESTIMONIALS, Product } from './data';
 
@@ -28,6 +30,35 @@ export default function App() {
   const [selectedProductForCalc, setSelectedProductForCalc] = useState<Product>(PRODUCTS_DATA[0]);
   const [installmentsCount, setInstallmentsCount] = useState<number>(12);
   const [faqOpen, setFaqOpen] = useState<Record<number, boolean>>({});
+
+  // Comparison feature states
+  const [compareList, setCompareList] = useState<Product[]>([]);
+  const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
+  const [compareWarning, setCompareWarning] = useState<string | null>(null);
+
+  // Clear comparison warning after some time
+  useEffect(() => {
+    if (compareWarning) {
+      const timer = setTimeout(() => {
+        setCompareWarning(null);
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [compareWarning]);
+
+  const toggleCompareProduct = (product: Product) => {
+    setCompareList(prev => {
+      const exists = prev.find(p => p.id === product.id);
+      if (exists) {
+        return prev.filter(p => p.id !== product.id);
+      }
+      if (prev.length >= 2) {
+        setCompareWarning("Você já selecionou 2 produtos para comparar. Remova um para adicionar outro!");
+        return prev;
+      }
+      return [...prev, product];
+    });
+  };
 
   // WhatsApp number for Silvânia-GO cell store (dummy phone for presentation)
   const WHATSAPP_NUMBER = '5562999999999';
@@ -367,7 +398,20 @@ export default function App() {
 
                 {/* Info Container */}
                 <div className="p-5 flex flex-col flex-grow">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">{product.category}</span>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{product.category}</span>
+                    <button
+                      onClick={() => toggleCompareProduct(product)}
+                      className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold transition-all ${
+                        compareList.some(p => p.id === product.id)
+                          ? 'bg-orange-500 text-white shadow-sm'
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      }`}
+                    >
+                      <GitCompare className="h-3 w-3" />
+                      {compareList.some(p => p.id === product.id) ? 'Selecionado' : 'Comparar'}
+                    </button>
+                  </div>
                   <h3 className="font-display text-lg font-bold text-slate-900 mb-1 line-clamp-1">{product.name}</h3>
                   <p className="text-xs text-slate-400 leading-relaxed mb-4 line-clamp-2 h-8">{product.description}</p>
                   
@@ -809,6 +853,222 @@ export default function App() {
           </div>
         </div>
       </footer>
+
+      {/* Comparison Warning Toast */}
+      {compareWarning && (
+        <div className="fixed top-20 right-4 left-4 sm:left-auto sm:w-96 z-50 bg-slate-900 border border-orange-500/30 text-white rounded-2xl p-4 shadow-xl flex items-center justify-between animate-fade-in">
+          <div className="flex items-center gap-2.5">
+            <Info className="h-5 w-5 text-orange-500 shrink-0" />
+            <p className="text-xs font-bold">{compareWarning}</p>
+          </div>
+          <button onClick={() => setCompareWarning(null)} className="text-slate-400 hover:text-white">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+
+      {/* Comparison Floating Dock */}
+      {compareList.length > 0 && (
+        <div className="fixed bottom-20 md:bottom-6 left-4 right-4 z-40 max-w-2xl mx-auto bg-slate-900/95 backdrop-blur-md border border-white/10 rounded-2xl p-4 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4 animate-slide-up text-white">
+          <div className="flex items-center gap-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-500 text-white shadow-md">
+              <GitCompare className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-sm font-bold font-display">Comparação de Aparelhos</p>
+              <p className="text-xs text-slate-400">
+                {compareList.length === 1 
+                  ? "Selecione mais um aparelho para comparar lado a lado." 
+                  : "Pronto! Veja a tabela comparativa completa."}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+            <div className="flex items-center gap-2 mr-2">
+              {compareList.map(p => (
+                <div key={p.id} className="relative group bg-slate-800 rounded-lg p-1.5 flex items-center gap-2 border border-white/5">
+                  <img src={p.image} alt={p.name} className="h-6 w-6 object-contain" />
+                  <span className="text-[10px] font-bold max-w-[80px] truncate">{p.name}</span>
+                  <button 
+                    onClick={() => toggleCompareProduct(p)} 
+                    className="text-slate-500 hover:text-red-400"
+                    title="Remover"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <button
+              disabled={compareList.length < 2}
+              onClick={() => setIsCompareModalOpen(true)}
+              className={`w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-xl px-5 py-2.5 text-xs font-bold transition-all ${
+                compareList.length === 2
+                  ? 'bg-orange-500 text-white hover:bg-orange-600 shadow-md shadow-orange-500/20 active:scale-[0.98]'
+                  : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+              }`}
+            >
+              <GitCompare className="h-3.5 w-3.5" />
+              Comparar Agora
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Comparison Modal */}
+      {isCompareModalOpen && compareList.length === 2 && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-white rounded-3xl border border-slate-100 shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col animate-scale-up">
+            
+            {/* Modal Header */}
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 text-orange-500 shadow-md">
+                  <GitCompare className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="font-display text-xl font-extrabold text-slate-900">Comparativo Técnico</h3>
+                  <p className="text-xs text-slate-400 uppercase tracking-wider font-bold">Lado a Lado • Cell Store Silvânia</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setIsCompareModalOpen(false)}
+                className="p-2 rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-slate-900 transition-colors shadow-sm"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Modal Body / Table Scroll */}
+            <div className="p-6 overflow-y-auto flex-grow space-y-6">
+              
+              {/* Product cards headers side-by-side */}
+              <div className="grid grid-cols-2 gap-4 pb-6 border-b border-slate-100">
+                {compareList.map(p => (
+                  <div key={p.id} className="text-center p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <div className="h-28 flex items-center justify-center mb-3">
+                      <img src={p.image} alt={p.name} className="h-24 w-24 object-contain" />
+                    </div>
+                    <span className="inline-block px-2.5 py-0.5 text-[9px] font-bold uppercase bg-slate-900 text-white rounded-md mb-2">{p.condition}</span>
+                    <h4 className="font-display font-bold text-slate-900 text-sm sm:text-base line-clamp-1">{p.name}</h4>
+                    <p className="text-orange-500 font-extrabold text-sm mt-1">{p.installments}</p>
+                    <p className="text-[11px] text-slate-400">ou R$ {p.priceCash.toLocaleString('pt-BR')} à vista</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Specifications rows */}
+              <div className="space-y-4">
+                
+                {/* 1. Tela */}
+                <div className="bg-slate-50/50 p-4 rounded-xl border border-slate-100/60">
+                  <span className="block text-center text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Tela</span>
+                  <div className="grid grid-cols-2 gap-6 text-center">
+                    <div className="border-r border-slate-100 pr-3">
+                      <p className="text-xs text-slate-500 font-semibold">{compareList[0].specs?.screen || 'N/A'}</p>
+                    </div>
+                    <div className="pl-3">
+                      <p className="text-xs text-slate-500 font-semibold">{compareList[1].specs?.screen || 'N/A'}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. Processador */}
+                <div className="p-4 rounded-xl border border-slate-100/60">
+                  <span className="block text-center text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Processador</span>
+                  <div className="grid grid-cols-2 gap-6 text-center">
+                    <div className="border-r border-slate-100 pr-3">
+                      <p className="text-xs text-slate-500 font-semibold">{compareList[0].specs?.processor || 'N/A'}</p>
+                    </div>
+                    <div className="pl-3">
+                      <p className="text-xs text-slate-500 font-semibold">{compareList[1].specs?.processor || 'N/A'}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. Câmeras */}
+                <div className="bg-slate-50/50 p-4 rounded-xl border border-slate-100/60">
+                  <span className="block text-center text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Câmeras</span>
+                  <div className="grid grid-cols-2 gap-6 text-center">
+                    <div className="border-r border-slate-100 pr-3">
+                      <p className="text-xs text-slate-500 font-semibold">{compareList[0].specs?.camera || 'N/A'}</p>
+                    </div>
+                    <div className="pl-3">
+                      <p className="text-xs text-slate-500 font-semibold">{compareList[1].specs?.camera || 'N/A'}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 4. Bateria */}
+                <div className="p-4 rounded-xl border border-slate-100/60">
+                  <span className="block text-center text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Bateria</span>
+                  <div className="grid grid-cols-2 gap-6 text-center">
+                    <div className="border-r border-slate-100 pr-3">
+                      <p className="text-xs text-slate-500 font-semibold">{compareList[0].specs?.battery || 'N/A'}</p>
+                    </div>
+                    <div className="pl-3">
+                      <p className="text-xs text-slate-500 font-semibold">{compareList[1].specs?.battery || 'N/A'}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 5. Armazenamento */}
+                <div className="bg-slate-50/50 p-4 rounded-xl border border-slate-100/60">
+                  <span className="block text-center text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Armazenamento</span>
+                  <div className="grid grid-cols-2 gap-6 text-center">
+                    <div className="border-r border-slate-100 pr-3">
+                      <p className="text-xs text-slate-500 font-semibold">{compareList[0].specs?.storage || 'N/A'}</p>
+                    </div>
+                    <div className="pl-3">
+                      <p className="text-xs text-slate-500 font-semibold">{compareList[1].specs?.storage || 'N/A'}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 6. Destaques / Recursos */}
+                <div className="p-4 rounded-xl border border-slate-100/60">
+                  <span className="block text-center text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Recursos Premium</span>
+                  <div className="grid grid-cols-2 gap-6 text-center">
+                    <div className="border-r border-slate-100 pr-3">
+                      <p className="text-xs text-slate-500 font-semibold">{compareList[0].specs?.features || 'N/A'}</p>
+                    </div>
+                    <div className="pl-3">
+                      <p className="text-xs text-slate-500 font-semibold">{compareList[1].specs?.features || 'N/A'}</p>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            {/* Modal Footer (CTAs side-by-side) */}
+            <div className="p-6 border-t border-slate-100 bg-slate-50 grid grid-cols-2 gap-4">
+              <a
+                href={getWhatsappLink(`Olá! Após comparar com o outro modelo, decidi pelo ${compareList[0].name} de R$ ${compareList[0].priceCash.toLocaleString('pt-BR')} à vista. Ainda está disponível?`)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-orange-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-orange-500/10 hover:bg-orange-600 transition-colors"
+              >
+                <MessageSquare className="h-4 w-4 fill-white stroke-none" />
+                Levar {compareList[0].name.split(' ')[0]}
+              </a>
+              
+              <a
+                href={getWhatsappLink(`Olá! Após comparar com o outro modelo, decidi pelo ${compareList[1].name} de R$ ${compareList[1].priceCash.toLocaleString('pt-BR')} à vista. Ainda está disponível?`)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-slate-900 text-white font-bold text-xs sm:text-sm shadow-md hover:bg-slate-800 transition-colors"
+              >
+                <MessageSquare className="h-4 w-4 fill-white stroke-none" />
+                Levar {compareList[1].name.split(' ')[0]}
+              </a>
+            </div>
+
+          </div>
+        </div>
+      )}
 
       {/* MOBILE BOTTOM NAVIGATION BAR */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-100 px-4 py-2 flex items-center justify-between shadow-[0_-8px_24px_rgba(15,23,42,0.06)]">
